@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'a_users',
     'honeypot',
     'honeypot_monitor',
+    'games',
 ]
 
 MIDDLEWARE = [
@@ -84,6 +85,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'a_core.context_processors.game_stats',
             ],
         },
     },

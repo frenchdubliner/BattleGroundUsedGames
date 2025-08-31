@@ -1,0 +1,60 @@
+{% extends 'layouts/blank.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex flex-col">
+    <div class="flex-1 p-8 pt-16">
+        <div class="max-w-md mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-red-900 mb-2">Remove Game</h1>
+                <p class="text-gray-600">Are you sure you want to remove this game from the marketplace?</p>
+            </div>
+
+            <!-- Confirmation Card -->
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <!-- Game Info -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-semibold text-gray-900 mb-2">{{ game.name }}</h3>
+                    <div class="text-sm text-gray-600">
+                        <p><strong>Condition:</strong> {{ game.get_condition_display }}</p>
+                        <p><strong>Price:</strong> {{ game.formatted_price }}</p>
+                        <p><strong>Listed:</strong> {{ game.created_at|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+
+                <!-- Warning Message -->
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <p class="text-red-800 font-medium">This action cannot be undone!</p>
+                    </div>
+                    <p class="text-red-700 text-sm mt-2">Once you remove this game, it will be permanently deleted from the marketplace and cannot be recovered.</p>
+                </div>
+
+                <!-- Confirmation Form -->
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                        Yes, Remove Game
+                    </button>
+                </form>
+
+                <!-- Action Buttons -->
+                <div class="mt-6 flex flex-col gap-3">
+                    <!-- Back to Game Details -->
+                    <a href="{% url 'games:game_detail' game.id %}" class="text-center bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200">
+                        Cancel - Keep Game
+                    </a>
+                    
+                    <!-- Back to Games List -->
+                    <a href="{% url 'games:game_list' %}" class="text-center bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200">
+                        Back to Games
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'layouts/blank.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex flex-col">
+    <div class="flex-1 p-8 pt-16">
+        <div class="max-w-7xl mx-auto">
+            <!-- Django Messages -->
+            {% if messages %}
+                <div class="mb-6">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 border border-green-300 text-green-800{% elif message.tags == 'error' %}bg-red-100 border border-red-300 text-red-800{% elif message.tags == 'warning' %}bg-yellow-100 border border-yellow-300 text-yellow-800{% else %}bg-blue-100 border border-blue-300 text-blue-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Available Games</h1>
+                    <p class="text-gray-600">Browse games from our community of sellers</p>
+                </div>
+                <a href="{% url 'games:add_game' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">
+                    + Add Your Game
+                </a>
+            </div>
+
+            <!-- Games Grid -->
+            {% if games %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {% for game in games %}
+                        <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+                            <div class="p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ game.name }}</h3>
+                                
+                                <div class="space-y-2 mb-4">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Price:</span>
+                                        <span class="text-lg font-bold text-blue-600">{{ game.formatted_price }}</span>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Condition:</span>
+                                        <span class="text-sm font-medium text-gray-800">{{ game.get_condition_display }}</span>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Seller:</span>
+                                        <span class="text-sm font-medium text-gray-800">{{ game.user.username }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Status Indicators -->
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    {% if game.missing_pieces %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            Missing Pieces
+                                        </span>
+                                    {% endif %}
+                                    
+                                    {% if game.smoking_house %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                            Smoking Household
+                                        </span>
+                                    {% endif %}
+                                    
+                                    {% if game.musty_smell %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            Musty Smell
+                                        </span>
+                                    {% endif %}
+                                    
+                                    {% if game.pet != 'none' %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                            Pet Exposure
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- View Details Button -->
+                                <a href="{% url 'games:game_detail' game.id %}" class="block w-full text-center bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-12">
+                    <div class="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No games available yet</h3>
+                    <p class="text-gray-600 mb-6">Be the first to add a game to our marketplace!</p>
+                    <a href="{% url 'games:add_game' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">
+                        Add Your First Game
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

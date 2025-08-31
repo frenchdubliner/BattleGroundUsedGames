@@ -1,7 +1,54 @@
 {% extends 'layouts/blank.html' %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-8 py-24">
-    <h1>Home</h1>
+<div class="min-h-screen bg-gray-50 flex flex-col"> <!-- Removed ml-64, layout handled by flexbox -->
+    <div class="flex-1 p-8 pt-16"> <!-- Added flex-1 to take remaining space -->
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Welcome to BattleGround</h1>
+            <p class="text-lg text-gray-600 text-center mb-12">Your trusted marketplace for used board games and tabletop adventures</p>
+            
+            <!-- Hero Section -->
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white text-center mb-8 shadow-xl">
+                <h2 class="text-2xl font-bold mb-4">Discover Amazing Games</h2>
+                <p class="text-blue-100 mb-6">Browse thousands of pre-owned games from passionate collectors</p>
+                <button class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg">
+                    Start Browsing
+                </button>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow border border-gray-100">
+                    <div class="w-12 h-12 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Find Games</h3>
+                    <p class="text-gray-600 text-sm">Search through our extensive collection</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow border border-gray-100">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Sell Games</h3>
+                    <p class="text-gray-600 text-sm">Turn your old games into cash or credit</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow border border-gray-100">
+                    <div class="w-12 h-12 bg-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Save Money</h3>
+                    <p class="text-gray-600 text-sm">Get great deals on quality games</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

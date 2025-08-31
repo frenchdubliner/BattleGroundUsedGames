@@ -1,0 +1,225 @@
+{% extends 'layouts/blank.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex flex-col">
+    <div class="flex-1 p-8 pt-16">
+        <div class="max-w-2xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Game</h1>
+                <p class="text-gray-600">Update your game listing on BattleGround</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <form method="post" class="space-y-6 game-form">
+                    {% csrf_token %}
+                    
+                    <!-- Game Name -->
+                    <div>
+                        <label for="id_name" class="block text-sm font-medium text-gray-700 mb-2">
+                            Game Name
+                        </label>
+                        <input type="text" 
+                               name="name" 
+                               id="id_name" 
+                               value="{{ form.name.value|default:'' }}"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Enter the name of your game">
+                        {% if form.name.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Price -->
+                    <div>
+                        <label for="id_price" class="block text-sm font-medium text-gray-700 mb-2">
+                            Price ($)
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-500">$</span>
+                            <input type="number" 
+                                   name="price" 
+                                   id="id_price" 
+                                   value="{{ form.price.value|default:'' }}"
+                                   step="0.01" 
+                                   min="0.01"
+                                   class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="0.00">
+                        </div>
+                        {% if form.price.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.price.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Condition -->
+                    <div>
+                        <label for="id_condition" class="block text-sm font-medium text-gray-700 mb-2">
+                            Game Condition
+                        </label>
+                        <select name="condition" 
+                                id="id_condition" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="new in shrink" {% if form.condition.value == 'new in shrink' %}selected{% endif %}>New in Shrink - Original shrinkwrap/seal is intact. Never Opened</option>
+                            <option value="like new" {% if form.condition.value == 'like new' %}selected{% endif %}>Like New - Pieces unpunched, cards wrapped, never played</option>
+                            <option value="very good" {% if form.condition.value == 'very good' %}selected{% endif %}>Very Good - Pieces punched, Sorted. Rarely or never played. No discernible wear</option>
+                            <option value="good" {% if form.condition.value == 'good' %}selected{% endif %}>Good - Played but well maintained. Pieces unsorted. Box/book(s) shows signs of use</option>
+                            <option value="fair" {% if form.condition.value == 'fair' %}selected{% endif %}>Fair - Discernible wear. Box/book(s) shows minor damage and/or have been slightly marked</option>
+                            <option value="poor" {% if form.condition.value == 'poor' %}selected{% endif %}>Poor - Worn but playable. Box/book(s) shows damage and/or have been significantly marked</option>
+                        </select>
+                        {% if form.condition.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.condition.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Missing Pieces Section -->
+                    <div class="space-y-4">
+                        <div class="flex items-center border border-gray-200 p-3 rounded bg-gray-50">
+                            <input type="checkbox" 
+                                   name="missing_pieces" 
+                                   id="id_missing_pieces" 
+                                   class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+                                   {% if form.missing_pieces.value %}checked{% endif %}>
+                            <label for="id_missing_pieces" class="ml-3 text-sm font-medium text-gray-700">
+                                Has Missing Pieces?
+                            </label>
+                        </div>
+                        
+                        {% if form.missing_pieces.errors %}
+                            <div class="text-sm text-red-600">
+                                {% for error in form.missing_pieces.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div id="missing-pieces-details" class="ml-7 {% if not form.missing_pieces.value %}hidden{% endif %}">
+                            <label for="id_description_of_missing_pieces" class="block text-sm font-medium text-gray-700 mb-2">
+                                Description of Missing Pieces
+                            </label>
+                            <textarea name="description_of_missing_pieces" 
+                                      id="id_description_of_missing_pieces" 
+                                      rows="3"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      placeholder="Describe what pieces are missing (e.g., 'Missing 2 red dice and instruction manual')">{{ form.description_of_missing_pieces.value|default:'' }}</textarea>
+                            {% if form.description_of_missing_pieces.errors %}
+                                <div class="mt-1 text-sm text-red-600">
+                                    {% for error in form.description_of_missing_pieces.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Environmental Factors -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Environmental Factors</h3>
+                        
+                        <!-- Smoking House Checkbox -->
+                        <div class="flex items-center border border-gray-200 p-3 rounded bg-gray-50">
+                            <input type="checkbox" 
+                                   name="smoking_house" 
+                                   id="id_smoking_house" 
+                                   class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+                                   {% if form.smoking_house.value %}checked{% endif %}>
+                            <label for="id_smoking_house" class="ml-3 text-sm font-medium text-gray-700">
+                                Exposed to Smoking Household?
+                            </label>
+                        </div>
+                        
+                        <!-- Musty Smell Checkbox -->
+                        <div class="flex items-center border border-gray-200 p-3 rounded bg-gray-50">
+                            <input type="checkbox" 
+                                   name="musty_smell" 
+                                   id="id_musty_smell" 
+                                   class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+                                   {% if form.musty_smell.value %}checked{% endif %}>
+                            <label for="id_musty_smell" class="ml-3 text-sm font-medium text-gray-700">
+                                Has Musty Smell?
+                            </label>
+                        </div>
+
+                        <!-- Pet Exposure Dropdown -->
+                        <div>
+                            <label for="id_pet" class="block text-sm font-medium text-gray-700 mb-2">
+                                Pet Exposure
+                            </label>
+                            <select name="pet" 
+                                    id="id_pet" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="none" {% if form.pet.value == 'none' %}selected{% endif %}>None</option>
+                                <option value="cat" {% if form.pet.value == 'cat' %}selected{% endif %}>Cat</option>
+                                <option value="dog" {% if form.pet.value == 'dog' %}selected{% endif %}>Dog</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Admin Only: Printed Field -->
+                    {% if form.printed %}
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Admin Information</h3>
+                            
+                            <!-- Printed Checkbox -->
+                            <div class="flex items-center border border-gray-200 p-3 rounded bg-blue-50">
+                                <input type="checkbox" 
+                                       name="printed" 
+                                       id="id_printed" 
+                                       class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+                                       {% if form.printed.value %}checked{% endif %}>
+                                <label for="id_printed" class="ml-3 text-sm font-medium text-gray-700">
+                                    Printed
+                                </label>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Submit Button -->
+                    <div class="pt-6">
+                        <button type="submit" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Update Game Listing
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Action Buttons -->
+                <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                    <!-- Back to Game Details -->
+                    <a href="{% url 'games:game_detail' game.id %}" class="flex-1 text-center bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200">
+                        Cancel
+                    </a>
+                    
+                    <!-- Back to Games List -->
+                    <a href="{% url 'games:game_list' %}" class="flex-1 text-center bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200">
+                        Back to Games
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show/hide missing pieces description based on checkbox
+    document.getElementById('id_missing_pieces').addEventListener('change', function() {
+        const detailsDiv = document.getElementById('missing-pieces-details');
+        if (this.checked) {
+            detailsDiv.classList.remove('hidden');
+        } else {
+            detailsDiv.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

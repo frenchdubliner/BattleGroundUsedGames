@@ -1,0 +1,176 @@
+{% extends 'layouts/blank.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex flex-col">
+    <div class="flex-1 p-8 pt-16">
+        <div class="max-w-4xl mx-auto">
+            <!-- Back Navigation -->
+            <div class="mb-6">
+                <a href="{% url 'games:game_list' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Back to Games
+                </a>
+            </div>
+
+            <!-- Game Details Card -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <!-- Header Section -->
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-8 text-white">
+                    <h1 class="text-3xl font-bold mb-2">{{ game.name }}</h1>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl font-bold">{{ game.formatted_price }}</span>
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
+                                {{ game.get_condition_display }}
+                            </span>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-blue-100 text-sm">Listed by</p>
+                            <p class="font-semibold">{{ game.user.username }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Information -->
+                <div class="p-8">
+                    <!-- Basic Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Game Details</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Price:</span>
+                                    <span class="font-semibold text-blue-600">{{ game.formatted_price }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Condition:</span>
+                                    <span class="font-medium">{{ game.get_condition_display }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Listed:</span>
+                                    <span class="font-medium">{{ game.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Last Updated:</span>
+                                    <span class="font-medium">{{ game.updated_at|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Seller Information</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Username:</span>
+                                    <span class="font-medium">{{ game.user.username }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Member Since:</span>
+                                    <span class="font-medium">{{ game.user.date_joined|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Only Information -->
+                    {% if user.is_staff %}
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Admin Information</h3>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span class="text-blue-800 font-medium">{{ game.printed|yesno:"True,False" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Status Indicators -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Game Status</h3>
+                        <div class="flex flex-wrap gap-3">
+                            {% if game.missing_pieces %}
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                    Missing Pieces
+                                </div>
+                            {% endif %}
+                            
+                            {% if game.smoking_house %}
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+                                    </svg>
+                                    Smoking Household
+                                </div>
+                            {% endif %}
+                            
+                            {% if game.musty_smell %}
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Musty Smell
+                                </div>
+                            {% endif %}
+                            
+                            {% if game.pet != 'none' %}
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                    </svg>
+                                    Pet Exposure ({{ game.get_pet_display }})
+                                </div>
+                            {% endif %}
+
+                            {% if not game.missing_pieces and not game.smoking_house and not game.musty_smell and game.pet == 'none' %}
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Excellent Condition
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Missing Pieces Description -->
+                    {% if game.missing_pieces and game.description_of_missing_pieces %}
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Missing Pieces Details</h3>
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                                <p class="text-red-800">{{ game.description_of_missing_pieces }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+                        {% if user.is_authenticated and user == game.user %}
+                            <a href="{% url 'games:edit_game' game.id %}" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 text-center">
+                                Edit Game
+                            </a>
+                            <a href="{% url 'games:delete_game' game.id %}" class="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200 text-center">
+                                Remove from Marketplace
+                            </a>
+                        {% else %}
+                            <button class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200">
+                                Contact Seller
+                            </button>
+                            <button class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">
+                                Make Offer
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

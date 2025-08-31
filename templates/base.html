@@ -75,6 +75,27 @@
         label {
             @apply hidden
         }
+        
+        /* Game form labels - ensure they are visible */
+        .game-form label,
+        .game-form input[type="checkbox"] + label,
+        .game-form select + label,
+        .game-form textarea + label {
+            @apply block !important
+        }
+        
+        /* Specific environmental factors labels */
+        #id_smoking_house + label,
+        #id_musty_smell + label,
+        #id_pet + label,
+        #id_missing_pieces + label {
+            @apply block !important
+        }
+        
+        /* Form field labels in general */
+        form label[for] {
+            @apply block !important
+        }
         input[type=file] {
             @apply bg-white pl-0
         }
@@ -101,8 +122,13 @@
     {% include 'includes/messages.html' %}
 
     {% include 'includes/header.html' %}
-
-    {% block layout %}{% endblock %}
+    
+    <div class="flex min-h-screen">
+        {% include 'includes/sidebar.html' %}
+        <main class="flex-1">
+            {% block layout %}{% endblock %}
+        </main>
+    </div>
 
 </body>
 </html>

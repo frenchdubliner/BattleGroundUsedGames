@@ -1,0 +1,178 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
+from django.http import HttpResponse
+from .models import Game
+from .forms import GameForm, AdminGameForm
+import csv
+
+def is_admin_user(user):
+    """Check if user is an admin/staff user"""
+    return user.is_authenticated and user.is_staff
+
+def game_list(request):
+    """Display games - users see only their own games, admins see all games"""
+    if request.user.is_authenticated and request.user.is_staff:
+        # Admin users can see all games
+        games = Game.objects.all().order_by('-created_at')
+    elif request.user.is_authenticated:
+        # Regular users can only see their own games
+        games = Game.objects.filter(user=request.user).order_by('-created_at')
+    else:
+        # Unauthenticated users see no games
+        games = Game.objects.none()
+    
+    return render(request, 'games/game_list.html', {'games': games})
+
+@login_required
+def add_game(request):
+    """Allow users to add a new game"""
+    if request.method == 'POST':
+        form = GameForm(request.POST)
+        if form.is_valid():
+            game = form.save(commit=False)
+            game.user = request.user
+            game.save()
+            messages.success(request, f'Game "{game.name}" added successfully!')
+            return redirect('games:game_list')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = GameForm()
+    
+    return render(request, 'games/add_game.html', {'form': form})
+
+def game_detail(request, game_id):
+    """Display detailed information about a specific game"""
+    game = get_object_or_404(Game, id=game_id)
+    return render(request, 'games/game_detail.html', {'game': game})
+
+@login_required
+def my_games(request):
+    """Display games owned by the current user"""
+    games = Game.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'games/my_games.html', {'games': games})
+
+@login_required
+def edit_game(request, game_id):
+    """Allow users to edit their own games, or admins to edit any game"""
+    game = get_object_or_404(Game, id=game_id)
+    
+    # Check if the user owns this game OR is an admin
+    if game.user != request.user and not request.user.is_staff:
+        messages.error(request, 'You can only edit your own games.')
+        return redirect('games:game_detail', game_id=game_id)
+    
+    # Use AdminGameForm for admins, GameForm for regular users
+    if request.user.is_staff:
+        form_class = AdminGameForm
+    else:
+        form_class = GameForm
+    
+    if request.method == 'POST':
+        form = form_class(request.POST, instance=game)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Game "{game.name}" updated successfully!')
+            return redirect('games:game_detail', game_id=game_id)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = form_class(instance=game)
+    
+    return render(request, 'games/edit_game.html', {'form': form, 'game': game})
+
+@login_required
+def delete_game(request, game_id):
+    """Allow users to delete their own games"""
+    game = get_object_or_404(Game, id=game_id)
+    
+    # Check if the user owns this game
+    if game.user != request.user:
+        messages.error(request, 'You can only delete your own games.')
+        return redirect('games:game_detail', game_id=game_id)
+    
+    if request.method == 'POST':
+        game_name = game.name
+        game.delete()
+        messages.success(request, f'Game "{game_name}" has been removed from the marketplace.')
+        return redirect('games:game_list')
+    
+    # If it's a GET request, show confirmation page
+    return render(request, 'games/delete_game_confirm.html', {'game': game})
+
+@user_passes_test(is_admin_user)
+def admin_only_games(request):
+    """Admin-only view showing all games from all users in a table format"""
+    games = Game.objects.all().select_related('user', 'user__profile').order_by('-created_at')
+    
+    # Get filter parameters
+    condition_filter = request.GET.get('condition', '')
+    printed_filter = request.GET.get('printed', '')
+    user_filter = request.GET.get('user', '')
+    drop_off_filter = request.GET.get('drop_off_location', '')
+    
+    # Apply filters
+    if condition_filter:
+        games = games.filter(condition=condition_filter)
+    if printed_filter != '':
+        games = games.filter(printed=printed_filter == 'true')
+    if user_filter:
+        games = games.filter(user__username__icontains=user_filter)
+    if drop_off_filter:
+        games = games.filter(user__profile__dropoff_location=drop_off_filter)
+    
+    # Handle CSV export
+    if request.GET.get('export') == 'csv':
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="games_export.csv"'
+        
+        writer = csv.writer(response)
+        # Write header row
+        writer.writerow([
+            'Game Name', 'Owner', 'Price', 'Condition', 'Missing Pieces', 
+            'Missing Pieces Description', 'Smoking House', 'Musty Smell', 
+            'Pet Exposure', 'Printed', 'Drop Off Location', 'Created Date'
+        ])
+        
+        # Write data rows
+        for game in games:
+            writer.writerow([
+                game.name,
+                game.user.username,
+                game.price,
+                game.get_condition_display(),
+                'Yes' if game.missing_pieces else 'No',
+                game.description_of_missing_pieces or '',
+                'Yes' if game.smoking_house else 'No',
+                'Yes' if game.musty_smell else 'No',
+                game.get_pet_display(),
+                'Yes' if game.printed else 'No',
+                game.user.profile.dropoff_location if hasattr(game.user, 'profile') else '',
+                game.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            ])
+        
+        return response
+    
+    # Get unique values for filter dropdowns
+    conditions = Game.CONDITION_CHOICES
+    users = Game.objects.values_list('user__username', flat=True).distinct().order_by('user__username')
+    
+    # Get drop off location choices from Profile model (not from Game model)
+    from a_users.models import Profile
+    drop_off_locations = Profile.DROPOFF_LOCATION_CHOICES
+    
+    context = {
+        'games': games,
+        'conditions': conditions,
+        'users': users,
+        'drop_off_locations': drop_off_locations,
+        'current_filters': {
+            'condition': condition_filter,
+            'printed': printed_filter,
+            'user': user_filter,
+            'drop_off_location': drop_off_filter,
+        }
+    }
+    
+    return render(request, 'games/admin_only_games.html', context)
