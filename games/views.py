@@ -135,7 +135,7 @@ def admin_only_games(request):
         writer = csv.writer(response)
         # Write header row
         writer.writerow([
-            'Game Name', 'Owner', 'Price', 'Condition', 'Missing Pieces', 
+            'Game ID', 'Game Name', 'Owner', 'Price', 'Condition', 'Missing Pieces', 
             'Missing Pieces Description', 'Smoking House', 'Musty Smell', 
             'Pet Exposure', 'Printed', 'Drop Off Location', 'Created Date'
         ])
@@ -143,6 +143,7 @@ def admin_only_games(request):
         # Write data rows
         for game in games:
             writer.writerow([
+                game.id,
                 game.name,
                 game.user.username,
                 game.price,
