@@ -240,7 +240,7 @@ def admin_only_games(request):
                         '-interaction=nonstopmode',
                         '-output-directory=' + temp_dir,
                         tex_filepath
-                    ], cwd=temp_dir, capture_output=True, text=True)
+                    ], cwd=temp_dir)
                     
                     # Check if PDF was generated successfully
                     generated_pdf = os.path.join(temp_dir, pdf_filename)
@@ -248,6 +248,10 @@ def admin_only_games(request):
                         # Move PDF to exports directory
                         shutil.move(generated_pdf, pdf_filepath)
                         successful_pdfs.append(pdf_filename)
+                        
+                        # Update the game's printed field to True since PDF was generated
+                        game.printed = True
+                        game.save()
                     else:
                         failed_pdfs.append(f"{game.name} (LaTeX compilation failed)")
                         
@@ -265,7 +269,7 @@ def admin_only_games(request):
             
             # Show success/error messages
             if successful_pdfs:
-                messages.success(request, f'Successfully generated {len(successful_pdfs)} PDF files in the exports folder.')
+                messages.success(request, f'Successfully generated {len(successful_pdfs)} PDF files in the exports folder. The "printed" field has been set to True for these games.')
             if failed_pdfs:
                 messages.error(request, f'Failed to generate PDFs for: {", ".join(failed_pdfs)}')
             
@@ -275,6 +279,70 @@ def admin_only_games(request):
         finally:
             # Clean up temporary directory
             shutil.rmtree(temp_dir)
+    
+    # Handle PDF merge
+    if request.GET.get('export') == 'merge':
+        exports_dir = os.path.join(settings.BASE_DIR, 'exports')
+        
+        if not os.path.exists(exports_dir):
+            messages.error(request, 'No exports folder found. Please generate PDFs first.')
+            return redirect('games:admin_only_games')
+        
+        # Get all PDF files in the exports directory
+        pdf_files = [f for f in os.listdir(exports_dir) if f.endswith('.pdf')]
+        
+        if not pdf_files:
+            messages.error(request, 'No PDF files found in the exports folder. Please generate PDFs first.')
+            return redirect('games:admin_only_games')
+        
+        # Sort PDF files by name for consistent ordering
+        pdf_files.sort()
+        
+        # Create input file list for pdftk
+        input_files = []
+        for pdf_file in pdf_files:
+            input_files.append(os.path.join(exports_dir, pdf_file))
+        
+        # Create merged PDF filename with timestamp
+        from datetime import datetime
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        merged_filename = f"merged_games_{timestamp}.pdf"
+        merged_filepath = os.path.join(exports_dir, merged_filename)
+        
+        try:
+            # Use pdftk to merge PDFs
+            # pdftk input1.pdf input2.pdf ... cat output merged.pdf
+            cmd = ['pdftk'] + input_files + ['cat', 'output', merged_filepath]
+            
+            result = subprocess.call(cmd)
+            
+            if result == 0 and os.path.exists(merged_filepath):
+                # Read the merged PDF and return it as download
+                with open(merged_filepath, 'rb') as f:
+                    response = HttpResponse(f.read(), content_type='application/pdf')
+                    response['Content-Disposition'] = f'attachment; filename="{merged_filename}"'
+                
+                # Delete all individual PDF files after successful download
+                for pdf_file in pdf_files:
+                    try:
+                        os.remove(os.path.join(exports_dir, pdf_file))
+                    except:
+                        pass
+                
+                # Delete the merged PDF file as well
+                try:
+                    os.remove(merged_filepath)
+                except:
+                    pass
+                
+                return response
+            else:
+                messages.error(request, 'Failed to merge PDFs. Please check if pdftk is installed.')
+                return redirect('games:admin_only_games')
+                
+        except Exception as e:
+            messages.error(request, f'Error merging PDFs: {str(e)}')
+            return redirect('games:admin_only_games')
     
     # Get unique values for filter dropdowns
     conditions = Game.CONDITION_CHOICES
