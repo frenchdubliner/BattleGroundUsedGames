@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'honeypot',
     'honeypot_monitor',
     'games',
+    'django_seed',
 ]
 
 MIDDLEWARE = [
