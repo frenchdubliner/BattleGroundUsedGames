@@ -106,6 +106,22 @@
                 </span>
             </div>
             
+            <!-- Average Game Price - Shows average price of visible games -->
+            <div class="flex justify-between items-center">
+                <span class="text-gray-400 text-sm">
+                    {% if user.is_authenticated and user.is_staff %}
+                        Avg Game Price
+                    {% elif user.is_authenticated %}
+                        My Avg Price
+                    {% else %}
+                        Avg Game Price
+                    {% endif %}
+                </span>
+                <span class="text-purple-400 font-semibold">
+                    ${{ average_game_price|floatformat:2|default:"0.00" }}
+                </span>
+            </div>
+            
             <!-- Active Sellers - Only visible to admin users -->
             {% if user.is_staff %}
                 <div class="flex justify-between items-center">

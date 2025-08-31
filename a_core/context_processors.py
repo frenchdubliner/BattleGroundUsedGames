@@ -1,4 +1,4 @@
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, Q, Sum, Avg
 from django.utils import timezone
 from datetime import timedelta
 from games.models import Game
@@ -23,18 +23,23 @@ def game_stats(request):
         else:
             context['active_sellers_count'] = None
         
-        # Total sum of game prices - based on what user can see
+        # Total sum and average of game prices - based on what user can see
         if request.user.is_staff:
-            # Admin users see total value of all games
+            # Admin users see total value and average of all games
             total_sum = Game.objects.aggregate(total=Sum('price'))['total'] or 0
+            avg_price = Game.objects.aggregate(avg=Avg('price'))['avg'] or 0
             context['total_games_sum'] = total_sum
+            context['average_game_price'] = avg_price
         elif request.user.is_authenticated:
-            # Regular users see total value of their own games
+            # Regular users see total value and average of their own games
             total_sum = Game.objects.filter(user=request.user).aggregate(total=Sum('price'))['total'] or 0
+            avg_price = Game.objects.filter(user=request.user).aggregate(avg=Avg('price'))['avg'] or 0
             context['total_games_sum'] = total_sum
+            context['average_game_price'] = avg_price
         else:
             # Unauthenticated users see no value
             context['total_games_sum'] = 0
+            context['average_game_price'] = 0
         
         # Today's deals (games created today)
         today = timezone.now().date()

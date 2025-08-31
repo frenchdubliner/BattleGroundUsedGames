@@ -5,6 +5,11 @@ from django.http import HttpResponse
 from .models import Game
 from .forms import GameForm, AdminGameForm
 import csv
+import os
+import zipfile
+import subprocess
+from django.conf import settings
+from django.template.loader import render_to_string
 
 def is_admin_user(user):
     """Check if user is an admin/staff user"""
@@ -153,6 +158,123 @@ def admin_only_games(request):
             ])
         
         return response
+    
+    # Handle LaTeX export
+    if request.GET.get('export') == 'latex':
+        # Create exports directory if it doesn't exist
+        exports_dir = os.path.join(settings.BASE_DIR, 'exports')
+        if not os.path.exists(exports_dir):
+            os.makedirs(exports_dir)
+        
+        # Create a temporary directory for LaTeX files
+        import tempfile
+        import shutil
+        
+        # Create a temporary directory
+        temp_dir = tempfile.mkdtemp()
+        
+        try:
+            # Read the LaTeX template
+            template_path = os.path.join(settings.BASE_DIR, 'games', 'templates', 'export_templates', 'tex_template.txt')
+            
+            with open(template_path, 'r', encoding='utf-8') as f:
+                template_content = f.read()
+            
+            # Track successful PDF generations
+            successful_pdfs = []
+            failed_pdfs = []
+            
+            # Generate LaTeX files for each game and convert to PDF
+            for game in games:
+                # Create filename for this game
+                safe_name = "".join(c for c in game.name if c.isalnum() or c in (' ', '-', '_')).rstrip()
+                safe_name = safe_name.replace(' ', '_')
+                tex_filename = f"game_{game.id}_{safe_name}.tex"
+                pdf_filename = f"game_{game.id}_{safe_name}.pdf"
+                
+                tex_filepath = os.path.join(temp_dir, tex_filename)
+                pdf_filepath = os.path.join(exports_dir, pdf_filename)
+                
+                # Replace template placeholders with actual values
+                game_content = template_content.replace('game.id', str(game.id))
+                game_content = game_content.replace('game.condition', game.get_condition_display())
+                game_content = game_content.replace('game.price', str(game.price))
+                
+                # Handle missing components
+                if game.missing_pieces:
+                    missing_components = f"Missing Components: {game.description_of_missing_pieces or 'Yes'}"
+                else:
+                    missing_components = "All Components Present"
+                game_content = game_content.replace('missingcomponents', missing_components)
+                
+                # Handle smoking household
+                if game.smoking_house:
+                    smoking_household = "Smoking Household: Yes"
+                else:
+                    smoking_household = "Smoking Household: No"
+                game_content = game_content.replace('smokinghousehold', smoking_household)
+                
+                # Handle animal condition
+                if game.pet != 'none':
+                    animal_condition = f"Animal Exposure: {game.get_pet_display()}"
+                else:
+                    animal_condition = "Animal Exposure: None"
+                game_content = game_content.replace('animalcondition', animal_condition)
+                
+                # Handle musty smell
+                if game.musty_smell:
+                    musty_smell = "Musty Smell: Yes"
+                else:
+                    musty_smell = "Musty Smell: No"
+                game_content = game_content.replace('mustysmell', musty_smell)
+                
+                # Write the LaTeX file
+                with open(tex_filepath, 'w', encoding='utf-8') as f:
+                    f.write(game_content)
+                
+                # Convert LaTeX to PDF using pdflatex
+                try:
+                    # Run pdflatex command
+                    result = subprocess.call([
+                        'pdflatex',
+                        '-interaction=nonstopmode',
+                        '-output-directory=' + temp_dir,
+                        tex_filepath
+                    ], cwd=temp_dir, capture_output=True, text=True)
+                    
+                    # Check if PDF was generated successfully
+                    generated_pdf = os.path.join(temp_dir, pdf_filename)
+                    if result == 0 and os.path.exists(generated_pdf):
+                        # Move PDF to exports directory
+                        shutil.move(generated_pdf, pdf_filepath)
+                        successful_pdfs.append(pdf_filename)
+                    else:
+                        failed_pdfs.append(f"{game.name} (LaTeX compilation failed)")
+                        
+                except Exception as e:
+                    failed_pdfs.append(f"{game.name} (Error: {str(e)})")
+            
+            # Clean up temporary LaTeX files and auxiliary files
+            for root, dirs, files in os.walk(temp_dir):
+                for file in files:
+                    if file.endswith(('.tex', '.aux', '.log', '.out')):
+                        try:
+                            os.remove(os.path.join(root, file))
+                        except:
+                            pass
+            
+            # Show success/error messages
+            if successful_pdfs:
+                messages.success(request, f'Successfully generated {len(successful_pdfs)} PDF files in the exports folder.')
+            if failed_pdfs:
+                messages.error(request, f'Failed to generate PDFs for: {", ".join(failed_pdfs)}')
+            
+            # Redirect back to the admin dashboard
+            return redirect('games:admin_only_games')
+            
+        finally:
+            # Clean up temporary directory
+            shutil.rmtree(temp_dir)
     
     # Get unique values for filter dropdowns
     conditions = Game.CONDITION_CHOICES

@@ -1,0 +1,49 @@
+
+\documentclass{article}
+
+\usepackage[paperheight=3in, paperwidth=2in, margin=0.1in, heightrounded]{geometry}
+\pagenumbering{gobble}
+\usepackage{color}
+\usepackage{ulem}
+\usepackage[sfdefault]{carlito}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+
+\begin{document}
+
+\raggedright
+
+\begin{flushright}
+    \fbox{{\large \textbf{PAXE25:game.id}}}
+\end{flushright}
+
+\vspace{0.5em}
+
+\textbf{\uline{SELLER'S RATING}}
+
+\vspace{0.5em}
+
+\footnotesize
+
+\textbf{game.condition}
+
+\vspace{0.5em}
+
+\textbf{\uline{COMPONENT ASSESSMENT}}
+
+\footnotesize
+
+\parbox{\linewidth}{missingcomponents}
+
+\parbox{\linewidth}{smokinghousehold}
+
+\parbox{\linewidth}{animalcondition}
+
+\parbox{\linewidth}{mustysmell}
+
+\vfill
+
+\large{\textbf{SELLER'S PRICE: \$game.price}}
+
+\end{document}
