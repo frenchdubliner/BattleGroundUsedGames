@@ -81,10 +81,8 @@
                     {% endif %}
                 </span>
                 <span class="text-blue-400 font-semibold">
-                    {% if user.is_authenticated and user.is_staff %}
-                        {{ total_games_count|default:"0" }}
-                    {% elif user.is_authenticated %}
-                        {{ user_games_count|default:"0" }}
+                    {% if user.is_authenticated %}
+                        {{ total_games|default:"0" }}
                     {% else %}
                         0
                     {% endif %}
@@ -102,7 +100,7 @@
                     {% endif %}
                 </span>
                 <span class="text-yellow-400 font-semibold">
-                    ${{ total_games_sum|floatformat:2|default:"0.00" }}
+                    ${{ total_value|floatformat:2|default:"0.00" }}
                 </span>
             </div>
             
@@ -118,7 +116,7 @@
                     {% endif %}
                 </span>
                 <span class="text-purple-400 font-semibold">
-                    ${{ average_game_price|floatformat:2|default:"0.00" }}
+                    ${{ avg_price|floatformat:2|default:"0.00" }}
                 </span>
             </div>
             
@@ -126,7 +124,7 @@
             {% if user.is_staff %}
                 <div class="flex justify-between items-center">
                     <span class="text-gray-400 text-sm">Active Sellers</span>
-                    <span class="text-green-400 font-semibold">{{ active_sellers_count|default:"0" }}</span>
+                    <span class="text-green-400 font-semibold">{{ active_sellers|default:"0" }}</span>
                 </div>
             {% endif %}
 
