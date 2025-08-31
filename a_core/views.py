@@ -1,2 +1,5 @@
-# This file is intentionally empty
-# All views have been moved to their respective apps
+from django.shortcuts import render
+
+def help_support(request):
+    """Display help and support contact information"""
+    return render(request, 'help_support.html')
