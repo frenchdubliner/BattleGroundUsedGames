@@ -31,3 +31,4 @@ def game_stats(request):
         'avg_price': round(avg_price, 2) if avg_price else 0,
         'active_sellers': active_sellers,
     }
+

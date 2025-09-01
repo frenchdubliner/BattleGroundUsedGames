@@ -112,12 +112,15 @@ def admin_only_games(request):
     games = Game.objects.all().select_related('user', 'user__profile').order_by('-created_at')
     
     # Get filter parameters
+    game_id_filter = request.GET.get('game_id', '')
     condition_filter = request.GET.get('condition', '')
     printed_filter = request.GET.get('printed', '')
     user_filter = request.GET.get('user', '')
     drop_off_filter = request.GET.get('drop_off_location', '')
     
     # Apply filters
+    if game_id_filter:
+        games = games.filter(id=game_id_filter)
     if condition_filter:
         games = games.filter(condition=condition_filter)
     if printed_filter != '':
@@ -359,6 +362,7 @@ def admin_only_games(request):
         'users': users,
         'drop_off_locations': drop_off_locations,
         'current_filters': {
+            'game_id': game_id_filter,
             'condition': condition_filter,
             'printed': printed_filter,
             'user': user_filter,

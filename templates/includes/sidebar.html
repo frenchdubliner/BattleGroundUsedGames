@@ -66,70 +66,33 @@
     <!-- Divider -->
     <div class="border-t border-gray-700 my-6"></div>
     
-    <!-- Quick Stats Section -->
-    <div class="bg-gray-700/50 rounded-lg p-4">
-        <h3 class="text-sm font-semibold text-gray-300 mb-3">Quick Stats</h3>
-        <div class="space-y-2">
-            <div class="flex justify-between items-center">
-                <span class="text-gray-400 text-sm">
-                    {% if user.is_authenticated and user.is_staff %}
-                        Total Games
-                    {% elif user.is_authenticated %}
-                        My Games
-                    {% else %}
-                        Games Available
-                    {% endif %}
-                </span>
-                <span class="text-blue-400 font-semibold">
-                    {% if user.is_authenticated %}
-                        {{ total_games|default:"0" }}
-                    {% else %}
-                        0
-                    {% endif %}
-                </span>
-            </div>
-            <!-- Total Sum - Shows total value of visible games -->
-            <div class="flex justify-between items-center">
-                <span class="text-gray-400 text-sm">
-                    {% if user.is_authenticated and user.is_staff %}
-                        Total Value
-                    {% elif user.is_authenticated %}
-                        My Games Value
-                    {% else %}
-                        Total Value
-                    {% endif %}
-                </span>
-                <span class="text-yellow-400 font-semibold">
-                    ${{ total_value|floatformat:2|default:"0.00" }}
-                </span>
-            </div>
-            
-            <!-- Average Game Price - Shows average price of visible games -->
-            <div class="flex justify-between items-center">
-                <span class="text-gray-400 text-sm">
-                    {% if user.is_authenticated and user.is_staff %}
-                        Avg Game Price
-                    {% elif user.is_authenticated %}
-                        My Avg Price
-                    {% else %}
-                        Avg Game Price
-                    {% endif %}
-                </span>
-                <span class="text-purple-400 font-semibold">
-                    ${{ avg_price|floatformat:2|default:"0.00" }}
-                </span>
-            </div>
-            
-            <!-- Active Sellers - Only visible to admin users -->
-            {% if user.is_staff %}
+    <!-- Quick Stats Section - Admin Only -->
+    {% if user.is_staff %}
+        <div class="bg-gray-700/50 rounded-lg p-4">
+            <h3 class="text-sm font-semibold text-gray-300 mb-3">Quick Stats</h3>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400 text-sm">Total Games</span>
+                    <span class="text-blue-400 font-semibold">{{ total_games|default:"0" }}</span>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400 text-sm">Total Value</span>
+                    <span class="text-yellow-400 font-semibold">${{ total_value|floatformat:2|default:"0.00" }}</span>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400 text-sm">Avg Game Price</span>
+                    <span class="text-purple-400 font-semibold">${{ avg_price|floatformat:2|default:"0.00" }}</span>
+                </div>
+                
                 <div class="flex justify-between items-center">
                     <span class="text-gray-400 text-sm">Active Sellers</span>
                     <span class="text-green-400 font-semibold">{{ active_sellers|default:"0" }}</span>
                 </div>
-            {% endif %}
-
+            </div>
         </div>
-    </div>
+    {% endif %}
     
     <!-- Footer -->
     <div class="mt-auto pt-6 text-center">
