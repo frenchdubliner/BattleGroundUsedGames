@@ -22,7 +22,7 @@ from a_home.views import *
 from a_users.views import profile_view
 from a_home.views import *
 from honeypot_monitor.views import honeypot_admin
-from a_core.views import help_support
+from a_core.views import help_support, admin_users_dashboard
 
 
 
@@ -35,6 +35,7 @@ urlpatterns = [
     path('games/', include('games.urls')),
     path('@<username>/', profile_view, name='profile'),
     path('help/', help_support, name='help_support'),
+    path('admin/users/', admin_users_dashboard, name='admin_users_dashboard'),
 ]
 
 # only in development

@@ -3,23 +3,69 @@
 {% block content %}
 {% if onboarding %}
 <h1 class="mb-4">Complete your Profile</h1>
+{% elif is_admin_editing %}
+<h1 class="mb-4">Edit Profile for {{ target_user.username }}</h1>
+<div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+    <p class="text-blue-800 text-sm">You are editing the profile of <strong>{{ target_user.username }}</strong> as an administrator.</p>
+</div>
 {% else %}
 <h1 class="mb-4">Edit your Profile</h1>
 {% endif %}
 
 <div class="text-center flex flex-col items-center">
-    <img id="avatar" class="w-36 h-36 rounded-full object-cover my-4" src="{{ user.profile.avatar }}" />
+    <img id="avatar" class="w-36 h-36 rounded-full object-cover my-4" src="{{ target_user.profile.avatar }}" />
     <div class="text-center max-w-md">
-        <h1 id="displayname">{{ user.profile.displayname|default:"" }}</h1>
-        <div class="text-gray-400 mb-2 -mt-3">@{{ user.username }}</div>
+        <h1 id="displayname">{{ target_user.profile.displayname|default:"" }}</h1>
+        <div class="text-gray-400 mb-2 -mt-3">@{{ target_user.username }}</div>
     </div>
 </div>
+
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" >Submit</button>
+    
+    <!-- User Information Section -->
+    <div class="mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                {{ form.first_name }}
+            </div>
+            <div>
+                <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                {{ form.last_name }}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Information Section -->
+    <div class="mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Profile Information</h3>
+        {% for field in form %}
+            {% if field.name not in 'first_name,last_name' %}
+                <div class="mb-4">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="text-sm text-gray-500 mt-1">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="text-red-600 text-sm mt-1">
+                            {% for error in field.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    
+    <button type="submit" class="button button-blue">Submit</button>
     {% if onboarding %}
     <a class="button button-gray ml-1" href="{% url 'home' %}">Skip</a>
+    {% elif is_admin_editing %}
+    <a class="button button-gray ml-1" href="{% url 'admin_users_dashboard' %}">Cancel</a>
     {% else %}
     <a class="button button-gray ml-1" href="{{ request.META.HTTP_REFERER }}">Cancel</a>
     {% endif %}
@@ -43,13 +89,39 @@
     }
     });
 
-    // This updates the name
+    // This updates the display name
     const display_nameInput = document.getElementById('id_displayname');
     const display_nameOutput = document.getElementById('displayname');
 
-    display_nameInput.addEventListener('input', (event) => {
-        display_nameOutput.innerText = event.target.value;
-    });
+    if (display_nameInput) {
+        display_nameInput.addEventListener('input', (event) => {
+            display_nameOutput.innerText = event.target.value;
+        });
+    }
+    
+    // This updates the full name display
+    const firstNameInput = document.getElementById('id_first_name');
+    const lastNameInput = document.getElementById('id_last_name');
+    
+    function updateFullName() {
+        const firstName = firstNameInput ? firstNameInput.value : '';
+        const lastName = lastNameInput ? lastNameInput.value : '';
+        const fullName = [firstName, lastName].filter(name => name.trim()).join(' ');
+        
+        if (fullName) {
+            // Update the display name if it's empty or show full name as fallback
+            if (!display_nameOutput.innerText.trim()) {
+                display_nameOutput.innerText = fullName;
+            }
+        }
+    }
+    
+    if (firstNameInput) {
+        firstNameInput.addEventListener('input', updateFullName);
+    }
+    if (lastNameInput) {
+        lastNameInput.addEventListener('input', updateFullName);
+    }
 
 </script>
 

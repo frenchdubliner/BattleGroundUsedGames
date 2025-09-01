@@ -1,5 +1,40 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from a_users.models import Profile
+
+def is_admin_user(user):
+    """Check if user is admin/staff"""
+    return user.is_authenticated and user.is_staff
 
 def help_support(request):
     """Display help and support contact information"""
     return render(request, 'help_support.html')
+
+@user_passes_test(is_admin_user)
+def admin_users_dashboard(request):
+    """Admin-only view showing all users in a table format"""
+    User = get_user_model()
+    users = User.objects.all().select_related('profile').order_by('-date_joined')
+    
+    # Handle user deletion
+    if request.method == 'POST' and 'delete_user' in request.POST:
+        user_id = request.POST.get('delete_user')
+        try:
+            user_to_delete = User.objects.get(id=user_id)
+            if user_to_delete != request.user:  # Prevent admin from deleting themselves
+                username = user_to_delete.username
+                user_to_delete.delete()
+                messages.success(request, f'User "{username}" has been deleted successfully.')
+            else:
+                messages.error(request, 'You cannot delete your own account.')
+        except User.DoesNotExist:
+            messages.error(request, 'User not found.')
+        return redirect('admin_users_dashboard')
+    
+    context = {
+        'users': users,
+    }
+    
+    return render(request, 'admin_users_dashboard.html', context)

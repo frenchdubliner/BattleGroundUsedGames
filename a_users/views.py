@@ -21,20 +21,42 @@ def profile_view(request, username=None):
     return render(request, 'a_users/profile.html', {'profile': profile})
 
 def profile_edit_view(request):
-    form = ProfileForm(instance=request.user.profile)
+    # Check if admin is editing another user's profile
+    user_id = request.GET.get('user_id')
+    is_admin_editing = False
+    target_user = request.user
+    
+    if user_id and request.user.is_staff:
+        try:
+            target_user = User.objects.get(id=user_id)
+            is_admin_editing = True
+        except User.DoesNotExist:
+            messages.error(request, 'User not found.')
+            return redirect('profile')
+    
+    form = ProfileForm(instance=target_user.profile)
     if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        form = ProfileForm(request.POST, request.FILES, instance=target_user.profile)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Profile updated successfully')
-            return redirect('profile')
+            if is_admin_editing:
+                messages.success(request, f'Profile for {target_user.username} updated successfully')
+                return redirect('admin_users_dashboard')
+            else:
+                messages.success(request, 'Profile updated successfully')
+                return redirect('profile')
 
     if request.path == reverse('profile_onboarding'):
         onboarding = True
     else:
         onboarding = False
 
-    return render(request, 'a_users/profile_edit.html', {'form': form, 'onboarding': onboarding})
+    return render(request, 'a_users/profile_edit.html', {
+        'form': form, 
+        'onboarding': onboarding, 
+        'is_admin_editing': is_admin_editing,
+        'target_user': target_user
+    })
 
 @login_required
 def profile_settings_view(request):
