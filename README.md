@@ -113,3 +113,77 @@ GRANT ALL PRIVILEGES ON DATABASE your-db-name TO your-db-password;
 python manage.py migrate
 python manage.py collectstatic --noinput
 ```
+
+## Step 4: Create Gunicorn Service
+
+1. **Create a systemd service file:**
+```bash
+sudo nano /etc/systemd/system/battleground.service
+```
+
+2. **Add the following content (replace your_user and your_path with the correct values):**
+```ini
+[Unit]
+Description=BattleGround Django App
+After=network.target
+
+[Service]
+User=your_user
+Group=www-data
+WorkingDirectory=your_path
+Environment="PATH=your_path/venv/bin"
+ExecStart=your_path/venv/bin/gunicorn --workers 3 --bind unix:your_path/battleground.sock a_core.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+3. **Start and enable the service:**
+```bash
+sudo systemctl start battleground
+sudo systemctl enable battleground
+sudo systemctl status battleground
+```
+
+## Step 5: Configure Nginx
+
+1. **Create Nginx configuration:**
+```bash
+sudo nano /etc/nginx/sites-available/battleground
+```
+
+2. **Add the following configuration:**
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com your-server-ip;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    
+    location /static/ {
+        root your_path;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    location /media/ {
+        root your_path;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:your_path/battleground.sock;
+    }
+}
+```
+
+3. **Enable the site:**
+```bash
+sudo ln -s /etc/nginx/sites-available/battleground /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+```
