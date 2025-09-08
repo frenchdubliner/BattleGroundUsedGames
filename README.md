@@ -66,4 +66,50 @@ pip install -r requirements.txt
 pip install gunicorn
 ```
 
+## Step 2: Environment Configuration
 
+1. **Create a `.env` file in your project root:**
+```bash
+nano .env
+```
+
+2. **Add the following content:**
+```env
+ENVIRONMENT=production
+SECRET_KEY=your-super-secret-key-here-generate-a-new-one
+DEBUG=False
+LIST_HOST_PRODUCTION=your-domain.com,your-server-ip
+
+DB_NAME=your-db-name
+DB_USER=your-db-password
+DB_PASSWORD=your-db-password
+DB_HOST=your-db-host
+DB_PORT=your-db-port
+LIST_USERNAME_BLACKLIST=username_1,username_2,usernam_3
+```
+
+3. **Generate a new secret key then add this to env:**
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+## Step 3: 1 & 2 only if database is local database
+
+1. **Create a PostgreSQL database:**
+```bash
+sudo -u postgres psql
+```
+
+2. **In PostgreSQL shell:**
+```sql
+CREATE DATABASE your-db-name;
+CREATE USER your-db-user WITH PASSWORD 'your-db-password';
+GRANT ALL PRIVILEGES ON DATABASE your-db-name TO your-db-password;
+\q
+```
+
+3. **Run migrations:**
+```bash
+python manage.py migrate
+python manage.py collectstatic --noinput
+```
