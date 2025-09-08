@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 from environ import Env
@@ -32,7 +32,11 @@ if ENVIRONMENT == 'production':
 else:
     DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1','*']
+if ENVIRONMENT == 'production':
+    ALLOWED_HOSTS = env('LIST_HOST_PRODUCTION').split(',')
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1','*']
+
 
 
 # Application definition
@@ -98,12 +102,24 @@ WSGI_APPLICATION = 'a_core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if ENVIRONMENT == 'development':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME'),
+            'USER': env('DB_USER'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': env('DB_HOST'),
+            'PORT': env('DB_PORT'),
+        }
+    }
 
 
 # Password validation
@@ -142,6 +158,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [ BASE_DIR / 'static' ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = 'media/'
@@ -198,3 +215,14 @@ LOGGING = {
         },
     },
 }
+
+#if ENVIRONMENT == 'production':
+    # Security settings for production
+    #SECURE_BROWSER_XSS_FILTER = True
+    #SECURE_CONTENT_TYPE_NOSNIFF = True
+    #X_FRAME_OPTIONS = 'DENY'
+
+    # If using HTTPS
+    #SECURE_SSL_REDIRECT = True
+    #SESSION_COOKIE_SECURE = True
+    #CSRF_COOKIE_SECURE = True

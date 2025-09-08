@@ -23,7 +23,7 @@ from a_users.views import profile_view
 from a_home.views import *
 from honeypot_monitor.views import honeypot_admin
 from a_core.views import help_support, admin_users_dashboard
-
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -40,3 +40,4 @@ urlpatterns = [
 
 # only in development
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
