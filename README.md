@@ -36,10 +36,34 @@ sudo apt install pdftk -y
 ```bash
 sudo apt install git -y
 ```
+
 8. **Install libpq-dev (used to generate fake games to test the load):**
 ```bash
 sudo apt-get install libpq-dev -y
 ```
 
+## Step 1: Set up the project
+
+1. **Clone the project in the folder you want:**
+```bash
+git clone https://github.com/frenchdubliner/BattleGroundUsedGames.git
+```
+
+2. **Navigate to your project directory (your_directory is the location of your directory):**
+```bash
+cd your_directory
+```
+
+3. **Create a virtual environment:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+4. **Install dependencies:**
+```bash
+pip install -r requirements.txt
+pip install gunicorn
+```
 
 
