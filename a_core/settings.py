@@ -160,6 +160,11 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [ BASE_DIR / 'static' ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+if ENVIRONMENT == 'production':
+    EXPORTS_ROOT = '/var/www/yuziva.com/exports'
+else:
+    EXPORTS_ROOT = os.path.join(BASE_DIR, 'exports')
+
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = 'media/'
 # Default primary key field type
@@ -173,7 +178,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 
-ACCOUNT_USERNAME_BLACKLIST = ['admin', 'theboss', 'theboss2', 'theboss3', 'accounts', 'profile', 'category ', 'post', 'comment', 'tag', 'category', 'posttag', 'postcategory','inbox']
+ACCOUNT_USERNAME_BLACKLIST = env('LIST_USERNAME_BLACKLIST').split(',')
 
 # Honeypot Configuration
 HONEYPOT_FIELD_NAME = 'website'

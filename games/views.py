@@ -166,7 +166,7 @@ def admin_only_games(request):
     # Handle LaTeX export
     if request.GET.get('export') == 'latex':
         # Create exports directory if it doesn't exist
-        exports_dir = os.path.join(settings.BASE_DIR, 'exports')
+        exports_dir = settings.EXPORTS_ROOT
         if not os.path.exists(exports_dir):
             os.makedirs(exports_dir)
         
@@ -240,7 +240,8 @@ def admin_only_games(request):
                 try:
                     # Run pdflatex command
                     result = subprocess.call([
-                        'pdflatex',
+                        '/usr/bin/pdflatex',  # Use absolute path
+                        # 'pdflatex',
                         '-interaction=nonstopmode',
                         '-output-directory=' + temp_dir,
                         tex_filepath
@@ -286,7 +287,7 @@ def admin_only_games(request):
     
     # Handle PDF merge
     if request.GET.get('export') == 'merge':
-        exports_dir = os.path.join(settings.BASE_DIR, 'exports')
+        exports_dir = settings.EXPORTS_ROOT
         
         if not os.path.exists(exports_dir):
             messages.error(request, 'No exports folder found. Please generate PDFs first.')
@@ -316,7 +317,7 @@ def admin_only_games(request):
         try:
             # Use pdftk to merge PDFs
             # pdftk input1.pdf input2.pdf ... cat output merged.pdf
-            cmd = ['pdftk'] + input_files + ['cat', 'output', merged_filepath]
+            cmd = ['/usr/bin/pdftk'] + input_files + ['cat', 'output', merged_filepath]
             
             result = subprocess.call(cmd)
             
