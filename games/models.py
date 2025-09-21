@@ -60,6 +60,10 @@ class Game(models.Model):
         default=False,
         help_text='Check if the game is a printed/custom version'
     )
+    received = models.BooleanField(
+        default=False,
+        help_text='Check if the game has been received by the store (admin only)'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -84,3 +88,12 @@ class Game(models.Model):
     def admin_only_printed_status(self):
         """Return printed status only for admin users"""
         return str(self.printed)
+    
+    def is_received_visible_to_user(self, user):
+        """Check if the received field should be visible to the given user"""
+        return user.is_authenticated and user.is_staff
+    
+    @property
+    def admin_only_received_status(self):
+        """Return received status only for admin users"""
+        return str(self.received)

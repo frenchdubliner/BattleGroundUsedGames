@@ -7,13 +7,18 @@ class ProfileForm(ModelForm):
     # Add User model fields
     first_name = forms.CharField(
         max_length=30, 
-        required=False, 
+        required=True, 
         widget=forms.TextInput(attrs={'placeholder': 'Enter your first name'})
     )
     last_name = forms.CharField(
         max_length=30, 
-        required=False, 
+        required=True, 
         widget=forms.TextInput(attrs={'placeholder': 'Enter your last name'})
+    )
+    phone_number = forms.CharField(
+        max_length=15,
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'Enter your phone number'})
     )
     
     class Meta:
@@ -31,9 +36,12 @@ class ProfileForm(ModelForm):
         if self.instance and self.instance.user:
             self.fields['first_name'].initial = self.instance.user.first_name
             self.fields['last_name'].initial = self.instance.user.last_name
+            self.fields['phone_number'].initial = self.instance.phone_number
     
     def save(self, commit=True):
         profile = super().save(commit=False)
+        # Update phone_number field
+        profile.phone_number = self.cleaned_data['phone_number']
         if commit:
             profile.save()
             # Update User model fields

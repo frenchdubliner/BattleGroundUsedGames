@@ -115,7 +115,9 @@ def admin_only_games(request):
     game_id_filter = request.GET.get('game_id', '')
     condition_filter = request.GET.get('condition', '')
     printed_filter = request.GET.get('printed', '')
-    user_filter = request.GET.get('user', '')
+    received_filter = request.GET.get('received', '')
+    first_name_filter = request.GET.get('first_name', '')
+    last_name_filter = request.GET.get('last_name', '')
     drop_off_filter = request.GET.get('drop_off_location', '')
     
     # Apply filters
@@ -125,8 +127,12 @@ def admin_only_games(request):
         games = games.filter(condition=condition_filter)
     if printed_filter != '':
         games = games.filter(printed=printed_filter == 'true')
-    if user_filter:
-        games = games.filter(user__username__icontains=user_filter)
+    if received_filter != '':
+        games = games.filter(received=received_filter == 'true')
+    if first_name_filter:
+        games = games.filter(user__first_name__icontains=first_name_filter)
+    if last_name_filter:
+        games = games.filter(user__last_name__icontains=last_name_filter)
     if drop_off_filter:
         games = games.filter(user__profile__dropoff_location=drop_off_filter)
     
@@ -138,9 +144,9 @@ def admin_only_games(request):
         writer = csv.writer(response)
         # Write header row
         writer.writerow([
-            'Game ID', 'Game Name', 'Owner', 'Price', 'Condition', 'Missing Pieces', 
+            'Game ID', 'Game Name', 'First Name', 'Last Name', 'Phone Number', 'Price', 'Condition', 'Missing Pieces', 
             'Missing Pieces Description', 'Smoking House', 'Musty Smell', 
-            'Pet Exposure', 'Printed', 'Drop Off Location', 'Created Date'
+            'Pet Exposure', 'Printed', 'Received', 'Drop Off Location', 'Created Date'
         ])
         
         # Write data rows
@@ -148,7 +154,9 @@ def admin_only_games(request):
             writer.writerow([
                 game.id,
                 game.name,
-                game.user.username,
+                game.user.first_name or '',
+                game.user.last_name or '',
+                game.user.profile.phone_number if hasattr(game.user, 'profile') else '',
                 game.price,
                 game.get_condition_display(),
                 'Yes' if game.missing_pieces else 'No',
@@ -157,6 +165,7 @@ def admin_only_games(request):
                 'Yes' if game.musty_smell else 'No',
                 game.get_pet_display(),
                 'Yes' if game.printed else 'No',
+                'Yes' if game.received else 'No',
                 game.user.profile.dropoff_location if hasattr(game.user, 'profile') else '',
                 game.created_at.strftime('%Y-%m-%d %H:%M:%S')
             ])
@@ -351,7 +360,8 @@ def admin_only_games(request):
     
     # Get unique values for filter dropdowns
     conditions = Game.CONDITION_CHOICES
-    users = Game.objects.values_list('user__username', flat=True).distinct().order_by('user__username')
+    first_names = Game.objects.values_list('user__first_name', flat=True).distinct().order_by('user__first_name').exclude(user__first_name='')
+    last_names = Game.objects.values_list('user__last_name', flat=True).distinct().order_by('user__last_name').exclude(user__last_name='')
     
     # Get drop off location choices from Profile model (not from Game model)
     from a_users.models import Profile
@@ -360,13 +370,16 @@ def admin_only_games(request):
     context = {
         'games': games,
         'conditions': conditions,
-        'users': users,
+        'first_names': first_names,
+        'last_names': last_names,
         'drop_off_locations': drop_off_locations,
         'current_filters': {
             'game_id': game_id_filter,
             'condition': condition_filter,
             'printed': printed_filter,
-            'user': user_filter,
+            'received': received_filter,
+            'first_name': first_name_filter,
+            'last_name': last_name_filter,
             'drop_off_location': drop_off_filter,
         }
     }

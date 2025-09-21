@@ -7,7 +7,7 @@
             <!-- Header -->
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Game</h1>
-                <p class="text-gray-600">Update your game listing on BattleGround</p>
+                <p class="text-gray-600">Update your game listing on Battleground</p>
             </div>
 
             <!-- Form Card -->
@@ -167,22 +167,38 @@
                         </div>
                     </div>
 
-                    <!-- Admin Only: Printed Field -->
-                    {% if form.printed %}
+                    <!-- Admin Only: Printed and Received Fields -->
+                    {% if form.printed or form.received %}
                         <div class="space-y-4">
                             <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">Admin Information</h3>
                             
                             <!-- Printed Checkbox -->
-                            <div class="flex items-center border border-gray-200 p-3 rounded bg-blue-50">
-                                <input type="checkbox" 
-                                       name="printed" 
-                                       id="id_printed" 
-                                       class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
-                                       {% if form.printed.value %}checked{% endif %}>
-                                <label for="id_printed" class="ml-3 text-sm font-medium text-gray-700">
-                                    Printed
-                                </label>
-                            </div>
+                            {% if form.printed %}
+                                <div class="flex items-center border border-gray-200 p-3 rounded bg-blue-50">
+                                    <input type="checkbox" 
+                                           name="printed" 
+                                           id="id_printed" 
+                                           class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+                                           {% if form.printed.value %}checked{% endif %}>
+                                    <label for="id_printed" class="ml-3 text-sm font-medium text-gray-700">
+                                        Printed
+                                    </label>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Received Checkbox -->
+                            {% if form.received %}
+                                <div class="flex items-center border border-gray-200 p-3 rounded bg-green-50">
+                                    <input type="checkbox" 
+                                           name="received" 
+                                           id="id_received" 
+                                           class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+                                           {% if form.received.value %}checked{% endif %}>
+                                    <label for="id_received" class="ml-3 text-sm font-medium text-gray-700">
+                                        Received by Store
+                                    </label>
+                                </div>
+                            {% endif %}
                         </div>
                     {% endif %}
 
