@@ -151,23 +151,16 @@
                     {% endif %}
 
                     <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                        {% if user.is_authenticated and user == game.user %}
+                    {% if user.is_authenticated and user == game.user %}
+                        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
                             <a href="{% url 'games:edit_game' game.id %}" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 text-center">
                                 Edit Game
                             </a>
                             <a href="{% url 'games:delete_game' game.id %}" class="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200 text-center">
                                 Remove from Marketplace
                             </a>
-                        {% else %}
-                            <button class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200">
-                                Contact Seller
-                            </button>
-                            <button class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">
-                                Make Offer
-                            </button>
-                        {% endif %}
-                    </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
