@@ -20,7 +20,7 @@ class AdminGameForm(forms.ModelForm):
     """Form for admin users to edit games (includes printed and received fields)"""
     class Meta:
         model = Game
-        fields = ['name', 'price', 'condition', 'missing_pieces', 'description_of_missing_pieces', 'smoking_house', 'musty_smell', 'pet', 'printed', 'received']
+        fields = ['name', 'price', 'condition', 'missing_pieces', 'description_of_missing_pieces', 'smoking_house', 'musty_smell', 'pet', 'printed', 'received', 'received_date']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'}),
             'price': forms.NumberInput(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent', 'step': '0.01', 'min': '0.01'}),
@@ -31,6 +31,7 @@ class AdminGameForm(forms.ModelForm):
             'pet': forms.Select(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'}),
             'printed': forms.CheckboxInput(attrs={'class': 'w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500'}),
             'received': forms.CheckboxInput(attrs={'class': 'w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500'}),
+            'received_date': forms.DateTimeInput(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent', 'type': 'datetime-local'}),
         }
 
 

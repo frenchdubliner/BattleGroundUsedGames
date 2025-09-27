@@ -144,19 +144,29 @@ def admin_only_games(request):
         writer = csv.writer(response)
         # Write header row
         writer.writerow([
-            'Game ID', 'Game Name', 'First Name', 'Last Name', 'Phone Number', 'Price', 'Condition', 'Missing Pieces', 
+            'Game ID', 'Game Name', 'First Name', 'Last Name', 'Email', 'Phone Number', 'Payment Choice', 'Price', 'Condition', 'Missing Pieces', 
             'Missing Pieces Description', 'Smoking House', 'Musty Smell', 
-            'Pet Exposure', 'Printed', 'Received', 'Drop Off Location', 'Created Date'
+            'Pet Exposure', 'Printed', 'Received', 'Received Date', 'Drop Off Location', 'Created Date'
         ])
         
         # Write data rows
         for game in games:
+            # Get payment choice display text
+            payment_choice_display = ''
+            if hasattr(game.user, 'profile') and game.user.profile.payment_choice:
+                if game.user.profile.payment_choice == 'cash_40':
+                    payment_choice_display = 'Cash (40%)'
+                elif game.user.profile.payment_choice == 'credit_70':
+                    payment_choice_display = 'Store Credit (70%)'
+            
             writer.writerow([
                 game.id,
                 game.name,
                 game.user.first_name or '',
                 game.user.last_name or '',
+                game.user.email or '',
                 game.user.profile.phone_number if hasattr(game.user, 'profile') else '',
+                payment_choice_display,
                 game.price,
                 game.get_condition_display(),
                 'Yes' if game.missing_pieces else 'No',
@@ -166,6 +176,7 @@ def admin_only_games(request):
                 game.get_pet_display(),
                 'Yes' if game.printed else 'No',
                 'Yes' if game.received else 'No',
+                game.received_date.strftime('%Y-%m-%d %H:%M:%S') if game.received_date else '',
                 game.user.profile.dropoff_location if hasattr(game.user, 'profile') else '',
                 game.created_at.strftime('%Y-%m-%d %H:%M:%S')
             ])

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
+from django.utils import timezone
 
 # Create your models here.
 class Game(models.Model):
@@ -64,6 +65,11 @@ class Game(models.Model):
         default=False,
         help_text='Check if the game has been received by the store (admin only)'
     )
+    received_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Date when the game was received by the store (admin only)'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -71,6 +77,18 @@ class Game(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Game'
         verbose_name_plural = 'Games'
+    
+    def save(self, *args, **kwargs):
+        # Check if received is being changed from False to True
+        if self.pk:  # Only for existing objects
+            old_instance = Game.objects.get(pk=self.pk)
+            if not old_instance.received and self.received:
+                # Set received_date when received changes from False to True
+                self.received_date = timezone.now()
+        elif self.received:  # For new objects that are immediately received
+            self.received_date = timezone.now()
+        
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.name} - {self.get_condition_display()} - ${self.price}"
@@ -97,3 +115,12 @@ class Game(models.Model):
     def admin_only_received_status(self):
         """Return received status only for admin users"""
         return str(self.received)
+    
+    def is_received_date_visible_to_user(self, user):
+        """Check if the received_date field should be visible to the given user"""
+        return user.is_authenticated and user.is_staff
+    
+    @property
+    def admin_only_received_date(self):
+        """Return received_date only for admin users"""
+        return self.received_date.strftime('%Y-%m-%d %H:%M:%S') if self.received_date else 'Not received'

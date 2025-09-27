@@ -15,7 +15,7 @@
 \raggedright
 
 \begin{flushright}
-    \fbox{{\large \textbf{PAXE25:game.id}}}
+    \fbox{{\large \textbf{PAXU25:game.id}}}
 \end{flushright}
 
 \vspace{0.5em}
