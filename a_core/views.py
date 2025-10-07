@@ -4,6 +4,9 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from a_users.models import Profile
+from django.core.mail import send_mail
+from django.conf import settings
+import logging
 import csv
 
 def is_admin_user(user):
@@ -70,3 +73,26 @@ def admin_users_dashboard(request):
     }
     
     return render(request, 'admin_users_dashboard.html', context)
+
+def test_email_debug(request):
+    logger = logging.getLogger('django.mail')
+    
+    try:
+        # Log the email settings
+        logger.info(f"EMAIL_HOST: {settings.EMAIL_HOST}")
+        logger.info(f"EMAIL_PORT: {settings.EMAIL_PORT}")
+        logger.info(f"EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
+        logger.info(f"EMAIL_USE_TLS: {settings.EMAIL_USE_TLS}")
+        
+        # Test email
+        result = send_mail(
+            'Test Email from Production',
+            'This is a test email from your production server.',
+            settings.DEFAULT_FROM_EMAIL,
+            ['usedgamestest@gmail.com'],
+            fail_silently=False,
+        )
+        return HttpResponse(f"Email sent successfully! Result: {result}")
+    except Exception as e:
+        logger.error(f"Email failed: {str(e)}")
+        return HttpResponse(f"Email failed: {str(e)}")

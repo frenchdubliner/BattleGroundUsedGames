@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Title</title>
+    <title>Battleground Used Games</title>
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://unpkg.com/htmx.org/dist/htmx.js" defer></script>
@@ -57,68 +57,48 @@
         .highlight {
             @apply !bg-indigo-100;
         }
-        .allauth content a {
-            @apply underline underline-offset-2
+        .button:disabled, button:disabled, [type='submit']:disabled, [type='button']:disabled {
+            @apply opacity-50 cursor-not-allowed
         }
-        .allauth content a:hover {
-            @apply text-indigo-500
+        .button:disabled:hover, button:disabled:hover, [type='submit']:disabled:hover, [type='button']:disabled:hover {
+            @apply bg-indigo-600 scale-100
         }
-        .allauth form[action="/accounts/signup/"] ul {
-            @apply hidden
+        .button:disabled:active, button:disabled:active, [type='submit']:disabled:active, [type='button']:disabled:active {
+            @apply scale-100
         }
-        .allauth form[action="/accounts/signup/"] ul.errorlist {
-            @apply block
+        .button.alert:disabled {
+            @apply bg-red-700
         }
-        .allauth .helptext {
-            @apply block mt-4
+        .button.alert:disabled:hover {
+            @apply bg-red-700
         }
-        label {
-            @apply hidden
+        .button-red:disabled {
+            @apply !bg-red-500
         }
-        
-        /* Game form labels - ensure they are visible */
-        .game-form label,
-        .game-form input[type="checkbox"] + label,
-        .game-form select + label,
-        .game-form textarea + label {
-            @apply block !important
+        .button-red:disabled:hover {
+            @apply !bg-red-500
         }
-        
-        /* Specific environmental factors labels */
-        #id_smoking_house + label,
-        #id_musty_smell + label,
-        #id_pet + label,
-        #id_missing_pieces + label {
-            @apply block !important
+        .button-gray:disabled {
+            @apply !bg-gray-300
         }
-        
-        /* Form field labels in general */
-        form label[for] {
-            @apply block !important
+        .button-gray:disabled:hover {
+            @apply !bg-gray-300
         }
-        input[type=file] {
-            @apply bg-white pl-0
+        .navitems>li>a {
+            @apply flex items-center gap-2 h-12 px-4 hover:bg-gray-700 rounded-lg;
         }
-        .textarea, textarea, input {
-            @apply w-full rounded-lg py-4 px-5 bg-gray-100
+        .hoverlist>* {
+            @apply hover:bg-gray-100 rounded-md transition duration-150;
         }
-        .errorlist li {
-            @apply p-1 pl-4 border-l-red-500 border-l-4 border-solid mb-2 text-red-500
+        .hoverlist>*>a {
+            @apply flex items-center p-2;
         }
-        label[for="id_remember"] {
-            @apply inline-block w-auto mr-2
+        .highlight {
+            @apply !bg-indigo-100;
         }
-        input[name="remember"] {
-            @apply w-auto
-        }
-        .alert-info { @apply bg-blue-300 }
-        .alert-success { @apply bg-green-400 }
-        .alert-warning { @apply bg-amber-400 }
-        .alert-danger { @apply bg-amber-500 }
     </style>
 </head>
-<body class="{% block class %}{% endblock %}">
-	
+<body class="bg-gray-50">
     {% include 'includes/messages.html' %}
 
     {% include 'includes/header.html' %}

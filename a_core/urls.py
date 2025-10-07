@@ -22,7 +22,7 @@ from a_home.views import *
 from a_users.views import profile_view
 from a_home.views import *
 from honeypot_monitor.views import honeypot_admin
-from a_core.views import help_support, admin_users_dashboard
+from a_core.views import help_support, admin_users_dashboard, test_email_debug
 from django.conf.urls.static import static
 
 
@@ -36,6 +36,7 @@ urlpatterns = [
     path('@<username>/', profile_view, name='profile'),
     path('help/', help_support, name='help_support'),
     path('admin/users/', admin_users_dashboard, name='admin_users_dashboard'),
+    path('test-email/', test_email_debug, name='test_email'),
 ]
 
 # only in development
