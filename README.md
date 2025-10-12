@@ -104,7 +104,7 @@ sudo -u postgres psql
 ```sql
 CREATE DATABASE your-db-name;
 CREATE USER your-db-user WITH PASSWORD 'your-db-password';
-GRANT ALL PRIVILEGES ON DATABASE your-db-name TO your-db-password;
+GRANT ALL PRIVILEGES ON DATABASE your-db-name TO your-db-user;
 \q
 ```
 
