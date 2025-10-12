@@ -187,3 +187,22 @@ sudo ln -s /etc/nginx/sites-available/battleground /etc/nginx/sites-enabled
 sudo nginx -t
 sudo systemctl restart nginx
 ```
+
+## Maintenance: 
+
+1. **Saving database:**
+```bash
+pg_dump -U your_db_user -h localhost -Fc your_db_name > db.dump
+```
+
+2. **Restoring database:**
+```bash
+pg_restore -h 127.0.0.1 -U your_db_user -d your_db_name db.dump
+```
+
+2. **Cleaning database before restoring if there are errors:**
+```bash
+sudo -u postgres dropdb your_db_name
+sudo -u postgres createdb your_db_name -O your_db_user
+
+```
