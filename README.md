@@ -214,3 +214,34 @@ sudo systemctl restart nginx
 sudo systemctl restart battleground
 
 ```
+
+
+4. **Check Logs:**
+```bash
+# 1. Check Django application logs (adjust service name as needed)
+sudo journalctl -u gunicorn -f
+sudo journalctl -u uwsgi -f
+sudo journalctl -u your-django-app -f
+
+# 2. Check system logs
+sudo journalctl -f | grep -i latex
+sudo journalctl -f | grep -i pdflatex
+
+# 3. Check if there are any log files in your Django project directory
+ls -la /var/www/your_website/logs/
+tail -f /var/www/your_website/logs/*.log
+
+# 4. Check the exports directory for any temporary files
+ls -la /var/www/your_website/exports/
+
+# Check Django application logs (if using systemd)
+sudo journalctl -u your-django-service-name -f
+
+# Or check if you have a specific log file for your Django app
+tail -f /var/log/django.log
+tail -f /var/log/your-app.log
+
+# Check system logs for any pdflatex errors
+sudo journalctl -f | grep pdflatex
+
+```
