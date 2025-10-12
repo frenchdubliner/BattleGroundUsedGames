@@ -93,6 +93,17 @@
                     <div class="mb-8">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Game Status</h3>
                         <div class="flex flex-wrap gap-3">
+                            {% if game.received %}
+                                <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Received by Store
+                                    {% if game.received_date %}
+                                        ({{ game.received_date|date:"M d, Y" }})
+                                    {% endif %}
+                                </div>
+                            {% endif %}
                             {% if game.missing_pieces %}
                                 <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-red-100 text-red-800">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,12 +164,18 @@
                     <!-- Action Buttons -->
                     {% if user.is_authenticated and user == game.user %}
                         <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                            <a href="{% url 'games:edit_game' game.id %}" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 text-center">
-                                Edit Game
-                            </a>
-                            <a href="{% url 'games:delete_game' game.id %}" class="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200 text-center">
-                                Remove from Marketplace
-                            </a>
+                            {% if not game.received or user.is_staff %}
+                                <a href="{% url 'games:edit_game' game.id %}" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 text-center">
+                                    Edit Game
+                                </a>
+                                <a href="{% url 'games:delete_game' game.id %}" class="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200 text-center">
+                                    Remove from Marketplace
+                                </a>
+                            {% else %}
+                                <div class="flex-1 bg-gray-100 text-gray-600 py-3 px-6 rounded-lg font-semibold text-center">
+                                    Game Received by Store - No Longer Editable
+                                </div>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
