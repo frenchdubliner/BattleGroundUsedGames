@@ -14,7 +14,8 @@ def user_post_save(sender, instance, created, **kwargs):
     else:
         try:
             email_address = EmailAddress.objects.get_primary(user)
-            if email_address != user.email:
+            # Only reset verification if the email actually changed
+            if email_address.email != user.email:
                 email_address.email = user.email
                 email_address.verified = False
                 email_address.save()
