@@ -213,5 +213,4 @@ sudo -u postgres createdb your_db_name -O your_db_user
 sudo systemctl restart nginx
 sudo systemctl restart battleground
 
-
 ```
