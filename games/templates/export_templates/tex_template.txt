@@ -18,7 +18,9 @@
     \fbox{{\large \textbf{PAXU25:game.id}}}
 \end{flushright}
 
-\vspace{0.5em}
+\footnotesize
+
+\parbox{\linewidth}{\tiny game.name}
 
 \textbf{\uline{SELLER'S RATING}}
 

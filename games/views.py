@@ -231,6 +231,7 @@ def admin_only_games(request):
                 
                 # Replace template placeholders with actual values
                 game_content = template_content.replace('game.id', str(game.id))
+                game_content = game_content.replace('game.name', game.name)
                 game_content = game_content.replace('game.condition', game.get_condition_display())
                 game_content = game_content.replace('game.price', str(game.price))
                 
