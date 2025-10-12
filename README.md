@@ -207,6 +207,7 @@ sudo -u postgres createdb your_db_name -O your_db_user
 
 ```
 
+
 4. **Restart Services:**
 ```bash
 sudo systemctl restart nginx
