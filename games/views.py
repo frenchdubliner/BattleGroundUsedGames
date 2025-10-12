@@ -68,6 +68,11 @@ def edit_game(request, game_id):
         messages.error(request, 'You can only edit your own games.')
         return redirect('games:game_detail', game_id=game_id)
     
+    # Check if game has been received by store - only admins can edit received games
+    if game.received and not request.user.is_staff:
+        messages.error(request, 'This game has been received by the store and can no longer be edited by users.')
+        return redirect('games:game_detail', game_id=game_id)
+    
     # Use AdminGameForm for admins, GameForm for regular users
     if request.user.is_staff:
         form_class = AdminGameForm
@@ -95,6 +100,11 @@ def delete_game(request, game_id):
     # Check if the user owns this game
     if game.user != request.user:
         messages.error(request, 'You can only delete your own games.')
+        return redirect('games:game_detail', game_id=game_id)
+    
+    # Check if game has been received by store - only admins can delete received games
+    if game.received and not request.user.is_staff:
+        messages.error(request, 'This game has been received by the store and can no longer be deleted by users.')
         return redirect('games:game_detail', game_id=game_id)
     
     if request.method == 'POST':
