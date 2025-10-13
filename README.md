@@ -236,7 +236,7 @@ sudo systemctl restart battleground
 ```
 
 
-4. **Check Logs:**
+5. **Check Logs:**
 ```bash
 # 1. Check Django application logs (adjust service name as needed)
 sudo journalctl -u gunicorn -f
@@ -269,4 +269,9 @@ sudo adduser your_user www-data
 sudo chown -R your_user:www-data /home/your_user/BattleGroundUsedGames/staticfiles
 sudo chmod -R 755 /home/your_user/BattleGroundUsedGames/staticfiles
 
+```
+
+6. **Seed  Games for Testing:**
+```bash
+python manage.py seed_games --number 20
 ```
