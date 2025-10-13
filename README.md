@@ -128,13 +128,18 @@ Description=BattleGround Django App
 After=network.target
 
 [Service]
+Type=notify
 User=your_user
 Group=www-data
-WorkingDirectory=your_path
-Environment="PATH=your_path/venv/bin"
-ExecStart=your_path/venv/bin/gunicorn --workers 3 --bind unix:your_path/battleground.sock a_core.wsgi:application
+WorkingDirectory=/home/your_user/BattleGroundUsedGames
+Environment="PATH=/home/your_user/BattleGroundUsedGames/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="DJANGO_SETTINGS_MODULE=a_core.settings"
+ExecStart=/home/your_user/BattleGroundUsedGames/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 a_core.wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
@@ -161,22 +166,28 @@ server {
     server_name your-domain.com your-server-ip;
 
     location = /favicon.ico { access_log off; log_not_found off; }
+
+    location /exports/ {
+        alias /var/www/your_website/exports/;
+        expires 1h;
+        add_header Cache-Control "public, no-cache";
+    }
     
     location /static/ {
-        root your_path;
+        alias /home/your_user_folder/BattleGroundUsedGames/staticfiles/;
         expires 30d;
         add_header Cache-Control "public, immutable";
     }
     
     location /media/ {
-        root your_path;
+        alias /home/your_user_folder/BattleGroundUsedGames/media/;
         expires 30d;
         add_header Cache-Control "public, immutable";
     }
 
     location / {
         include proxy_params;
-        proxy_pass http://unix:your_path/battleground.sock;
+        proxy_pass http://127.0.0.1:8000;
     }
 }
 ```
@@ -251,6 +262,11 @@ tail -f /var/log/django.log
 tail -f /var/log/your-app.log
 
 # Check system logs for any pdflatex errors
-sudo journalctl -f | grep pdflatex
+sudo journalctl -f | grep 
+
+# 5. Resolve access problems
+sudo adduser your_user www-data
+sudo chown -R your_user:www-data /home/your_user/BattleGroundUsedGames/staticfiles
+sudo chmod -R 755 /home/your_user/BattleGroundUsedGames/staticfiles
 
 ```
