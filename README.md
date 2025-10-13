@@ -188,6 +188,15 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
+4. **Enable SSL:**
+```bash
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d your_domain_or_server_ip
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+
 ## Maintenance: 
 
 1. **Saving database:**
