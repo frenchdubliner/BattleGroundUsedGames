@@ -29,6 +29,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', honeypot_admin, name='honeypot_admin'),  # Honeypot - fake admin
     path('theboss/', admin.site.urls),  # Real admin
+    path('captcha/', include('captcha.urls')),
     path('accounts/', include('allauth.urls')),
     path('', home_view, name='home'),
     path('profile/', include('a_users.urls')),

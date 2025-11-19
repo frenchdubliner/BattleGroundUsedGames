@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_cleanup.apps.CleanupConfig',
+    'captcha',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -187,6 +188,10 @@ else:
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_FORMS = {
+    'signup': 'a_users.allauth_forms.CustomSignupForm',
+}
+ACCOUNT_SIGNUP_REDIRECT_URL = '/profile/onboarding/'
 
 ACCOUNT_USERNAME_BLACKLIST = env('LIST_USERNAME_BLACKLIST').split(',')
 
@@ -194,6 +199,17 @@ ACCOUNT_USERNAME_BLACKLIST = env('LIST_USERNAME_BLACKLIST').split(',')
 HONEYPOT_FIELD_NAME = 'website'
 HONEYPOT_VALUE = ''
 HONEYPOT_VERIFIER = 'honeypot.middleware.HoneypotViewMiddleware'
+
+# Captcha Configuration
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
+CAPTCHA_LENGTH = 4
+CAPTCHA_TIMEOUT = 5  # minutes
+CAPTCHA_IMAGE_SIZE = (200, 60)  # Increased size for better readability
+CAPTCHA_FONT_SIZE = 32  # Larger font for better visibility
+CAPTCHA_BACKGROUND_COLOR = '#ffffff'  # White background
+CAPTCHA_FOREGROUND_COLOR = '#000000'  # Black text for better contrast
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)  # Simpler noise
+CAPTCHA_CHARACTER_SET = '0123456789+-*/='  # Math characters only
 
 # Logging Configuration
 LOGGING = {

@@ -21,6 +21,10 @@ def profile_view(request, username=None):
     return render(request, 'a_users/profile.html', {'profile': profile})
 
 def profile_edit_view(request):
+    # Check if user is authenticated
+    if not request.user.is_authenticated:
+        return redirect('account_login')
+    
     # Check if admin is editing another user's profile
     user_id = request.GET.get('user_id')
     is_admin_editing = False

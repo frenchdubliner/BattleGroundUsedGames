@@ -68,11 +68,6 @@ def edit_game(request, game_id):
         messages.error(request, 'You can only edit your own games.')
         return redirect('games:game_detail', game_id=game_id)
     
-    # Check if game has been received by store - only admins can edit received games
-    if game.received and not request.user.is_staff:
-        messages.error(request, 'This game has been received by the store and can no longer be edited by users.')
-        return redirect('games:game_detail', game_id=game_id)
-    
     # Use AdminGameForm for admins, GameForm for regular users
     if request.user.is_staff:
         form_class = AdminGameForm
@@ -100,11 +95,6 @@ def delete_game(request, game_id):
     # Check if the user owns this game
     if game.user != request.user:
         messages.error(request, 'You can only delete your own games.')
-        return redirect('games:game_detail', game_id=game_id)
-    
-    # Check if game has been received by store - only admins can delete received games
-    if game.received and not request.user.is_staff:
-        messages.error(request, 'This game has been received by the store and can no longer be deleted by users.')
         return redirect('games:game_detail', game_id=game_id)
     
     if request.method == 'POST':
@@ -231,9 +221,6 @@ def admin_only_games(request):
                 
                 # Replace template placeholders with actual values
                 game_content = template_content.replace('game.id', str(game.id))
-                # Escape underscores in game name for LaTeX
-                escaped_game_name = game.name.replace('_', '\\_')
-                game_content = game_content.replace('game.name', escaped_game_name)
                 game_content = game_content.replace('game.condition', game.get_condition_display())
                 game_content = game_content.replace('game.price', str(game.price))
                 
@@ -269,12 +256,6 @@ def admin_only_games(request):
                 with open(tex_filepath, 'w', encoding='utf-8') as f:
                     f.write(game_content)
                 
-                # Debug: Print the generated LaTeX content for problematic games
-                if 'test_I_will_remove' in game.name:
-                    print(f"Generated LaTeX content for {game.name}:")
-                    print(game_content)
-                    print("=" * 50)
-                
                 # Convert LaTeX to PDF using pdflatex
                 try:
                     # Run pdflatex command
@@ -297,19 +278,9 @@ def admin_only_games(request):
                         game.printed = True
                         game.save()
                     else:
-                        # Log the LaTeX compilation error
-                        log_file = os.path.join(temp_dir, f"game_{game.id}_{safe_name}.log")
-                        error_details = "LaTeX compilation failed"
-                        if os.path.exists(log_file):
-                            with open(log_file, 'r', encoding='utf-8', errors='ignore') as f:
-                                error_details = f.read()[-500:]  # Last 500 characters
-                        
-                        print(f"LaTeX compilation failed for {game.name} (ID: {game.id})")
-                        print(f"Error details: {error_details}")
                         failed_pdfs.append(f"{game.name} (LaTeX compilation failed)")
                         
                 except Exception as e:
-                    print(f"Exception during LaTeX compilation for {game.name}: {str(e)}")
                     failed_pdfs.append(f"{game.name} (Error: {str(e)})")
             
             # Clean up temporary LaTeX files and auxiliary files
